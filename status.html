@@ -2,78 +2,77 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Valhallab Daily Status</title>
+  <title>Valhallab Daily Status Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 50px;
+      padding: 30px;
       background: #f0f0f0;
     }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .status-card {
+    table {
+      margin: 0 auto;
+      border-collapse: collapse;
       background: white;
-      padding: 20px;
-      border-radius: 10px;
-      display: inline-block;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      text-align: left;
     }
-    .status-card p {
-      margin: 8px 0;
-      font-size: 16px;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
     }
-    .label {
-      font-weight: bold;
+    th {
+      background: #eee;
     }
   </style>
 </head>
 <body>
 
-  <h1>Valhallab Daily Status</h1>
-  <div class="status-card" id="status">
-    <p>Loading status...</p>
-  </div>
+  <h1>Valhallab Daily Status Test</h1>
+  <table id="status-table">
+    <thead>
+      <tr>
+        <th>DATE</th>
+        <th>DEPARTURE TIME</th>
+        <th>WEATHER</th>
+        <th>STATUS</th>
+        <th>NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQapPgqlQxeNBXqQ6oCcG-X1m7S2tUbOWbrx1xbvlqOyGW6Of_78PJwq8p-0LFOyWv9xmnHOZd9z2c9/pub?output=csv&t=" + new Date().getTime();
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQapPgqlQxeNBXqQ6oCcG-X1m7S2tUbOWbrx1xbvlqOyGW6Of_78PJwq8p-0LFOyWv9xmnHOZd9z2c9/pub?gid=0&single=true&output=csv&t=" + new Date().getTime();
 
     Papa.parse(csvUrl, {
       download: true,
       header: true,
       skipEmptyLines: true,
       complete: function(results) {
-        const data = results.data.filter(row =>
-          row.DATE || row['DEPARTURE TIME'] || row.WEATHER || row.STATUS || row.NOTES
-        );
+        const rows = results.data;
+        const tbody = document.querySelector("#status-table tbody");
 
-        console.log("Fetched data:", data);
-
-        if (data.length === 0) {
-          document.getElementById('status').innerHTML = '<p>No status available.</p>';
+        if (rows.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='5'>No data available</td></tr>";
           return;
         }
 
-        // Instead of showing latest, show first valid row (for your test setup)
-        const latest = data[0];
-        const safe = (value) => value && value.trim() ? value : 'N/A';
-
-        const statusDiv = document.getElementById('status');
-        statusDiv.innerHTML = `
-          <p><span class="label">📅 Date:</span> ${safe(latest.DATE)}</p>
-          <p><span class="label">🕓 Departure Time:</span> ${safe(latest['DEPARTURE TIME'])}</p>
-          <p><span class="label">🌦️ Weather:</span> ${safe(latest.WEATHER)}</p>
-          <p><span class="label">✅ Status:</span> ${safe(latest.STATUS)}</p>
-          <p><span class="label">📝 Notes:</span> ${safe(latest.NOTES)}</p>
-        `;
+        rows.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.DATE || ''}</td>
+            <td>${row['DEPARTURE TIME'] || ''}</td>
+            <td>${row.WEATHER || ''}</td>
+            <td>${row.STATUS || ''}</td>
+            <td>${row.NOTES || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
       },
       error: function(err) {
-        document.getElementById('status').innerHTML = '<p>Error loading status.</p>';
         console.error("PapaParse error:", err);
       }
     });
