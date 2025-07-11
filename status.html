@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Valhallab Daily Status</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #f0f0f0;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .status-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-align: left;
+    }
+    .status-card p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Valhallab Daily Status</h1>
+  <div class="status-card" id="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script>
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQapPgqlQxeNBXqQ6oCcG-X1m7S2tUbOWbrx1xbvlqOyGW6Of_78PJwq8p-0LFOyWv9xmnHOZd9z2c9/pub?output=csv&t=" + new Date().getTime();
+
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const data = results.data.filter(row => row.DATE);
+        const latest = data[data.length - 1];
+
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerHTML = `
+          <p><span class="label">📅 Date:</span> ${latest.DATE}</p>
+          <p><span class="label">🕓 Departure Time:</span> ${latest['DEPARTURE TIME']}</p>
+          <p><span class="label">🌦️ Weather:</span> ${latest.WEATHER}</p>
+          <p><span class="label">✅ Status:</span> ${latest.STATUS}</p>
+          <p><span class="label">📝 Notes:</span> ${latest.NOTES}</p>
+        `;
+      }
+    });
+  </script>
+
+</body>
+</html>
