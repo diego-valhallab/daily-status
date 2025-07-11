@@ -52,12 +52,15 @@
           row.DATE || row['DEPARTURE TIME'] || row.WEATHER || row.STATUS || row.NOTES
         );
 
+        console.log("Fetched data:", data);
+
         if (data.length === 0) {
           document.getElementById('status').innerHTML = '<p>No status available.</p>';
           return;
         }
 
-        const latest = data[data.length - 1];
+        // Instead of showing latest, show first valid row (for your test setup)
+        const latest = data[0];
         const safe = (value) => value && value.trim() ? value : 'N/A';
 
         const statusDiv = document.getElementById('status');
@@ -78,4 +81,3 @@
 
 </body>
 </html>
-
